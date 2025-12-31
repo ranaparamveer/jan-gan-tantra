@@ -12,8 +12,13 @@ export const metadata: Metadata = {
     description: 'Empowering citizens to navigate bureaucracy and solve civic problems',
     keywords: ['civic tech', 'india', 'government', 'accountability', 'RTI'],
     manifest: '/manifest.json',
+}
+
+export const viewport = {
     themeColor: '#0ea5e9',
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
 }
 
 import Header from '@/components/Header'
