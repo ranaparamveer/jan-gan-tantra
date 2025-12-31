@@ -6,6 +6,7 @@ interface Location {
     lat: number
     lng: number
     label: string
+    bbox?: [number, number, number, number] // minLat, minLng, maxLat, maxLng
 }
 
 interface LocationContextType {

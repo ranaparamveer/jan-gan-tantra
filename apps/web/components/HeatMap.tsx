@@ -45,8 +45,45 @@ export default function HeatMap({
     const [issues, setIssues] = useState<Issue[]>([])
     const markersRef = useRef<L.Marker[]>([])
     const circlesRef = useRef<L.Circle[]>([])
+    const geocodeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const { location, setLocation } = useLocation()
+
+    // Helper: Reverse Geocode
+    const reverseGeocode = useCallback(async (lat: number, lng: number, zoom: number) => {
+        try {
+            const { data } = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+                params: {
+                    format: 'json',
+                    lat,
+                    lon: lng,
+                    zoom: zoom > 18 ? 18 : zoom,
+                    addressdetails: 1
+                }
+            })
+
+            const addr = data.address || {}
+            let label = ''
+
+            // Heuristic labels based on zoom
+            if (zoom < 10) {
+                label = addr.impt_city || addr.city || addr.state || addr.country || ''
+            } else if (zoom < 14) {
+                label = addr.suburb || addr.city_district || addr.district || addr.city || ''
+            } else {
+                label = addr.road || addr.neighbourhood || addr.suburb || ''
+                if (!label && addr.building) label = addr.building
+            }
+
+            // Fallback
+            if (!label) label = data.display_name?.split(',')[0] || 'Selected Location'
+
+            return label
+        } catch (error) {
+            console.error("Reverse geocoding failed", error)
+            return ''
+        }
+    }, [])
 
     // Fetch issues based on map bounds
     const fetchIssues = useCallback(async () => {
@@ -122,13 +159,30 @@ export default function HeatMap({
             map.on('moveend', () => {
                 fetchIssues()
 
-                // Sync to context
-                const center = map.getCenter()
-                setLocation({
-                    lat: center.lat,
-                    lng: center.lng,
-                    label: 'Map Location'
-                })
+                // Debounced Reverse Geocoding
+                if (geocodeTimeoutRef.current) clearTimeout(geocodeTimeoutRef.current)
+
+                geocodeTimeoutRef.current = setTimeout(async () => {
+                    if (!mapRef.current) return
+                    const center = map.getCenter()
+                    const z = map.getZoom()
+
+                    // Need to check if component is mounted/ref valid context?
+                    // We can just call the helper.
+
+                    try {
+                        const label = await reverseGeocode(center.lat, center.lng, z)
+                        if (label) {
+                            setLocation({
+                                lat: center.lat,
+                                lng: center.lng,
+                                label: label
+                            })
+                        }
+                    } catch (e) {
+                        console.error(e)
+                    }
+                }, 800) // 800ms debounce
             })
 
             // Initial fetch
@@ -151,7 +205,22 @@ export default function HeatMap({
     useEffect(() => {
         if (!mapRef.current || !location) return
 
-        const currentCenter = mapRef.current.getCenter()
+        const map = mapRef.current
+
+        // Priority 1: Bounding Box (Smart Zoom)
+        if (location.bbox) {
+            const [minLat, minLng, maxLat, maxLng] = location.bbox
+            // Convert to Leaflet bounds: [[minLat, minLng], [maxLat, maxLng]]
+            map.fitBounds([[minLat, minLng], [maxLat, maxLng]], {
+                padding: [50, 50],
+                maxZoom: 16,
+                animate: true
+            })
+            return
+        }
+
+        // Priority 2: Center Point
+        const currentCenter = map.getCenter()
         const dist = Math.sqrt(
             Math.pow(currentCenter.lat - location.lat, 2) +
             Math.pow(currentCenter.lng - location.lng, 2)
@@ -159,7 +228,7 @@ export default function HeatMap({
 
         // Only move if distance is significant (> ~50m) to prevent loops/jitters
         if (dist > 0.0005) {
-            mapRef.current.setView([location.lat, location.lng], 14, { animate: true })
+            map.setView([location.lat, location.lng], 14, { animate: true })
         }
     }, [location])
 
@@ -184,8 +253,6 @@ export default function HeatMap({
         }
 
         issues.forEach((issue) => {
-            // Unpack location (GeoJSON Point: { type: 'Point', coordinates: [lng, lat] })
-            // Note: GeoJSON is [lng, lat], Leaflet is [lat, lng]
             const [lng, lat] = issue.location.coordinates
 
             // 1. Heat Circle (Status-based color)
@@ -194,7 +261,7 @@ export default function HeatMap({
                 color: circleColor,
                 fillColor: circleColor,
                 fillOpacity: 0.15,
-                radius: 300, // Fixed radius for heat effect
+                radius: 300,
                 stroke: false
             }).addTo(mapRef.current!)
             circlesRef.current.push(heatCircle)
