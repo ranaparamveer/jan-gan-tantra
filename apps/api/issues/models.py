@@ -38,6 +38,7 @@ class Issue(models.Model):
     
     # Engagement metrics
     upvotes = models.IntegerField(default=0)
+    downvotes = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     
     class Meta:

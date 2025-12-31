@@ -91,7 +91,15 @@ class IssueViewSet(viewsets.ModelViewSet):
         issue = self.get_object()
         issue.upvotes += 1
         issue.save()
-        return Response({'upvotes': issue.upvotes})
+        return Response({'upvotes': issue.upvotes, 'downvotes': issue.downvotes})
+
+    @action(detail=True, methods=['post'])
+    def downvote(self, request, pk=None):
+        """Downvote an issue"""
+        issue = self.get_object()
+        issue.downvotes += 1
+        issue.save()
+        return Response({'upvotes': issue.upvotes, 'downvotes': issue.downvotes})
     
     @action(detail=True, methods=['post'])
     def update_status(self, request, pk=None):

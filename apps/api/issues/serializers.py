@@ -22,7 +22,7 @@ class IssueListSerializer(GeoFeatureModelSerializer):
         model = Issue
         geo_field = 'location'
         fields = ['id', 'title', 'category_name', 'status', 'status_display', 
-                  'created_at', 'upvotes']
+                  'created_at', 'upvotes', 'downvotes']
 
 
 class IssueDetailSerializer(serializers.ModelSerializer):
@@ -45,8 +45,8 @@ class IssueDetailSerializer(serializers.ModelSerializer):
                   'location', 'location_lat', 'location_lng', 'address', 
                   'status', 'status_display', 'reported_by_name', 'assigned_to_name',
                   'evidence_photos', 'evidence_documents', 'created_at', 'updated_at',
-                  'resolved_at', 'upvotes', 'views', 'updates']
-        read_only_fields = ['created_at', 'updated_at', 'resolved_at', 'upvotes', 'views']
+                  'resolved_at', 'upvotes', 'downvotes', 'views', 'updates']
+        read_only_fields = ['created_at', 'updated_at', 'resolved_at', 'upvotes', 'downvotes', 'views']
     
     def get_location_lat(self, obj):
         return obj.location.y if obj.location else None

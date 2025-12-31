@@ -2,6 +2,9 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 from .models import Solution, Category, Template, SuccessPath, SolutionSuggestion
 from .serializers import (
     SolutionListSerializer, 
@@ -53,6 +56,22 @@ class SolutionViewSet(viewsets.ModelViewSet):
         verified_only = self.request.query_params.get('verified')
         if verified_only == 'true':
             queryset = queryset.filter(is_verified=True)
+
+        # Geospatial Filtering
+        lat = self.request.query_params.get('lat')
+        lng = self.request.query_params.get('lng')
+        radius_km = self.request.query_params.get('radius', 5)
+        
+        if lat and lng:
+            try:
+                point = Point(float(lng), float(lat), srid=4326)
+                queryset = queryset.filter(
+                    location__distance_lte=(point, D(km=float(radius_km)))
+                ).annotate(
+                    distance=Distance('location', point)
+                ).order_by('distance')
+            except (ValueError, TypeError):
+                pass
         
         return queryset
     
