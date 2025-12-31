@@ -12,3 +12,4 @@ requests==2.31
 openai==1.12
 sentence-transformers==2.3
 pgvector==0.2
+beautifulsoup4==4.12
