@@ -16,14 +16,22 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      react:
+      react-ecosystem:
         patterns:
           - "react*"
           - "next"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
       dev-dependencies:
         dependency-type: "development"
         update-types:
           - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
           - "patch"
 
   # Backend dependencies
@@ -41,10 +49,18 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      django:
+      django-ecosystem:
         patterns:
           - "Django*"
           - "django-*"
+          - "djangorestframework*"
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        dependency-type: "production"
+        update-types:
+          - "patch"
 
   # Docker dependencies
   - package-ecosystem: "docker"

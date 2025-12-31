@@ -46,6 +46,13 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'apps/api/requirements.txt'
     
+    - name: Install GDAL and system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdal-bin libgdal-dev
+        export CPLUS_INCLUDE_PATH=/usr/include/gdal
+        export C_INCLUDE_PATH=/usr/include/gdal
+    
     - name: Install dependencies
       run: |
         cd apps/api
@@ -94,7 +101,8 @@ jobs:
     - name: Install dependencies
       run: |
         cd apps/web
-        npm ci
+        npm audit --audit-level=high
+        npm install
     
     - name: Run linting
       run: |
