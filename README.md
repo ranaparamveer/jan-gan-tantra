@@ -38,7 +38,7 @@ Jan-Gan-Tantra transforms the citizen-government relationship by providing:
 
 | Component | Technology | Why? |
 |-----------|-----------|------|
-| Frontend | Next.js 15 | SEO-friendly, PWA support, fast |
+| Frontend | Next.js 15.1 | SEO-friendly, PWA support, fast |
 | Backend | Django 5.1 | Complex data relationships, GIS support |
 | Database | PostgreSQL 16 + PostGIS | Geospatial queries, vector search |
 | Search | MeiliSearch | Typo-tolerant, multi-language |
@@ -54,8 +54,8 @@ Jan-Gan-Tantra transforms the citizen-government relationship by providing:
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js 20+
-- Python 3.12+
+- Node.js 20+ (for local development)
+- Python 3.12+ (for local development)
 
 ### Quick Start
 
