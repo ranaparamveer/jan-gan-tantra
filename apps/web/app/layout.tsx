@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,6 +16,10 @@ export const metadata: Metadata = {
     viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
 
+import Header from '@/components/Header'
+
+import { LocationProvider } from '@/context/LocationContext'
+
 export default function RootLayout({
     children,
 }: {
@@ -20,7 +27,12 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>{children}</body>
+            <body className={inter.className}>
+                <LocationProvider>
+                    <Header />
+                    {children}
+                </LocationProvider>
+            </body>
         </html>
     )
 }

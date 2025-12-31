@@ -19,7 +19,15 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 echo "🐳 Starting Docker services..."
-docker-compose up -d
+docker compose up -d --build
+
+echo ""
+echo "⏳ Waiting for services to be healthy..."
+sleep 10
+docker compose exec api python manage.py makemigrations wiki govgraph issues ai
+docker compose exec api python manage.py migrate
+docker compose exec api python manage.py seed_data
+docker compose exec api python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'admin'); user = User.objects.get(username='admin'); user.set_password('admin'); user.save()"
 
 echo ""
 echo "⏳ Waiting for services to be healthy..."
@@ -39,4 +47,4 @@ echo "   1. Run migrations: docker-compose exec api python manage.py migrate"
 echo "   2. Create superuser: docker-compose exec api python manage.py createsuperuser"
 echo "   3. Visit http://localhost:3000"
 echo ""
-echo "🛑 To stop: docker-compose down"
+echo "🛑 To stop: docker compose down"

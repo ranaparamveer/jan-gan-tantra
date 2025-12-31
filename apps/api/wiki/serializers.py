@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Solution, Category, Template, SuccessPath
+from .models import Solution, Category, Template, SuccessPath, SolutionSuggestion
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -31,6 +31,13 @@ class SuccessPathSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'upvotes']
 
 
+class SolutionSuggestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SolutionSuggestion
+        fields = ['id', 'solution', 'suggestion_text', 'status', 'created_at']
+        read_only_fields = ['id', 'status', 'created_at']
+
+
 class SolutionListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views"""
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -38,7 +45,7 @@ class SolutionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Solution
         fields = ['id', 'title', 'description', 'category_name', 'language', 
-                  'success_rate', 'is_verified', 'created_at']
+                  'success_rate', 'upvotes', 'is_verified', 'created_at']
 
 
 class SolutionDetailSerializer(serializers.ModelSerializer):
@@ -55,7 +62,7 @@ class SolutionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Solution
         fields = ['id', 'title', 'description', 'problem_keywords', 'steps', 
-                  'success_rate', 'language', 'category', 'category_id', 
+                  'success_rate', 'upvotes', 'language', 'category', 'category_id', 
                   'created_by_name', 'created_at', 'updated_at', 'is_verified',
                   'success_paths']
-        read_only_fields = ['created_at', 'updated_at', 'success_rate']
+        read_only_fields = ['created_at', 'updated_at', 'success_rate', 'upvotes']

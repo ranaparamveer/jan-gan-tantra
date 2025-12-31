@@ -45,7 +45,7 @@ fi
 
 # Test 4: Database Connection
 echo "4️⃣  Testing Database Connection..."
-if docker-compose exec -T db pg_isready > /dev/null 2>&1; then
+if docker compose exec -T db pg_isready > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Database is connected${NC}"
 else
     echo -e "${RED}✗ Database connection failed${NC}"
@@ -53,7 +53,7 @@ fi
 
 # Test 5: Redis Connection
 echo "5️⃣  Testing Redis Connection..."
-if docker-compose exec -T redis redis-cli ping > /dev/null 2>&1; then
+if docker compose exec -T redis redis-cli ping > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Redis is connected${NC}"
 else
     echo -e "${RED}✗ Redis connection failed${NC}"

@@ -85,7 +85,7 @@ export default function SolutionList({ category, language = 'en', searchQuery }:
             {solutions.map((solution) => (
                 <Link
                     key={solution.id}
-                    href={`/solutions/${solution.id}`}
+                    href={`/solution/${solution.id}`}
                     className="block bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg 
                      hover:border-primary-300 transition-all duration-200"
                 >

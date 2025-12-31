@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     
     # Third party
     'rest_framework',
+    'rest_framework_gis',
     'corsheaders',
     'drf_yasg',  # Swagger documentation
     
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'govgraph',
     'issues',
     'ai',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -66,16 +68,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database
+import environ
+import os
+
+env = environ.Env()
+
+# Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DB_NAME', 'jan_gan_tantra'),
-        'USER': os.environ.get('DB_USER', 'jgt_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'jgt_dev_password'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
+    'default': env.db('DATABASE_URL', default='postgis://jgt_user:jgt_dev_password@localhost:5432/jan_gan_tantra'),
 }
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

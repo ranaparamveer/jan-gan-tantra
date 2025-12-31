@@ -2,13 +2,14 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Solution, Category, Template, SuccessPath
+from .models import Solution, Category, Template, SuccessPath, SolutionSuggestion
 from .serializers import (
     SolutionListSerializer, 
     SolutionDetailSerializer,
     CategorySerializer,
     TemplateSerializer,
-    SuccessPathSerializer
+    SuccessPathSerializer,
+    SolutionSuggestionSerializer
 )
 
 
@@ -62,10 +63,21 @@ class SolutionViewSet(viewsets.ModelViewSet):
     def upvote(self, request, pk=None):
         """Mark solution as helpful"""
         solution = self.get_object()
-        # TODO: Track user votes to prevent duplicates
-        solution.success_rate = min(100, solution.success_rate + 1)
+        # TODO: Track user votes properly to prevent duplicates (e.g. separate Upvote model)
+        # For now, just increment the counter
+        solution.upvotes += 1
+        # Update success rate as a derived metric if needed, OR just use upvotes
+        # For this logic, we'll keep success_rate as is or maybe it should be manual
         solution.save()
-        return Response({'success_rate': solution.success_rate})
+        return Response({'upvotes': solution.upvotes, 'success_rate': solution.success_rate})
+
+    @action(detail=True, methods=['post'])
+    def downvote(self, request, pk=None):
+        """Mark solution as less helpful"""
+        solution = self.get_object()
+        solution.upvotes -= 1
+        solution.save()
+        return Response({'upvotes': solution.upvotes, 'success_rate': solution.success_rate})
 
 
 class TemplateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -144,3 +156,16 @@ class SuccessPathViewSet(viewsets.ModelViewSet):
         success_path.upvotes += 1
         success_path.save()
         return Response({'upvotes': success_path.upvotes})
+
+
+class SolutionSuggestionViewSet(viewsets.ModelViewSet):
+    """
+    Submit and view suggestions (Create only for public, Read-only for others unless admin)
+    """
+    queryset = SolutionSuggestion.objects.all()
+    serializer_class = SolutionSuggestionSerializer
+    
+    # For now, allow anyone to create
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)

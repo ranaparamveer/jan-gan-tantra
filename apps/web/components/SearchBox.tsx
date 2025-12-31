@@ -91,7 +91,7 @@ export default function SearchBox({ onSearch, placeholder = "What is your proble
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={placeholder}
-                    className="w-full px-6 py-4 pr-32 text-lg border-2 border-gray-300 rounded-full 
+                    className="w-full px-6 py-4 pr-32 text-lg text-gray-900 bg-white border-2 border-gray-300 rounded-full 
                      focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200
                      transition-all duration-200"
                     disabled={isRecording || isTranscribing}
@@ -104,10 +104,10 @@ export default function SearchBox({ onSearch, placeholder = "What is your proble
                         onClick={isRecording ? stopRecording : startRecording}
                         disabled={isTranscribing}
                         className={`p-3 rounded-full transition-all duration-200 ${isRecording
-                                ? 'bg-red-500 hover:bg-red-600 animate-pulse'
-                                : isTranscribing
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-primary-500 hover:bg-primary-600'
+                            ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                            : isTranscribing
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-primary-500 hover:bg-primary-600'
                             } text-white`}
                         title={isRecording ? 'Stop recording' : 'Voice search'}
                     >

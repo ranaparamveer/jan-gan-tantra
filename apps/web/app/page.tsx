@@ -4,6 +4,8 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import SearchBox from '@/components/SearchBox'
 import SolutionList from '@/components/SolutionList'
+import ReportIssueModal from '@/components/ReportIssueModal'
+import NearbyStats from '@/components/NearbyStats'
 
 // Dynamic import for HeatMap to avoid SSR issues with Leaflet
 const HeatMap = dynamic(() => import('@/components/HeatMap'), { ssr: false })
@@ -11,6 +13,8 @@ const HeatMap = dynamic(() => import('@/components/HeatMap'), { ssr: false })
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedIssue, setSelectedIssue] = useState<any>(null)
+    const [language, setLanguage] = useState('en')
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
     const handleSearch = (query: string) => {
         setSearchQuery(query)
@@ -21,23 +25,7 @@ export default function Home() {
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-            {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-primary-700">Jan-Gan-Tantra</h1>
-                            <p className="text-sm text-gray-600">जन-गण-तंत्र | People's System</p>
-                        </div>
-                        <nav className="flex gap-4 text-sm">
-                            <a href="#solutions" className="text-gray-600 hover:text-primary-600">Solutions</a>
-                            <a href="#map" className="text-gray-600 hover:text-primary-600">Issues Map</a>
-                            <a href="/about" className="text-gray-600 hover:text-primary-600">About</a>
-                        </nav>
-                    </div>
-                </div>
-            </header>
+        <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir={language === 'hi' ? 'ltr' : 'ltr'}> { /* Simple direction handling */}
 
             {/* Hero Section with Search */}
             <section className="py-12 px-4">
@@ -49,7 +37,7 @@ export default function Home() {
                         Search for solutions, report issues, or find the right government officer
                     </p>
 
-                    <SearchBox onSearch={handleSearch} language="en" />
+                    <SearchBox onSearch={handleSearch} language={language} />
 
                     <div className="mt-6 flex flex-wrap justify-center gap-3">
                         <button
@@ -82,47 +70,43 @@ export default function Home() {
 
             {/* Two Column Layout */}
             <section className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Solutions Column */}
-                    <div id="solutions">
-                        <div className="mb-4">
-                            <h3 className="text-2xl font-bold text-gray-900">
-                                {searchQuery ? `Solutions for "${searchQuery}"` : 'Popular Solutions'}
-                            </h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                                Step-by-step guides to solve civic problems
-                            </p>
-                        </div>
-                        <SolutionList searchQuery={searchQuery} language="en" />
-                    </div>
-
-                    {/* Map Column */}
-                    <div id="map">
-                        <div className="mb-4">
+                <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
+                    {/* Map and Nearby Stats Column (Full Width) */}
+                    <div id="map-and-stats">
+                        <div className="mb-4 text-center">
                             <h3 className="text-2xl font-bold text-gray-900">Issues Near You</h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
                                 Real-time civic issues reported by citizens
                             </p>
                         </div>
-                        <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
-                            <HeatMap onIssueClick={handleIssueClick} />
-                        </div>
 
-                        {selectedIssue && (
-                            <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
-                                <h4 className="font-semibold text-gray-900">{selectedIssue.title}</h4>
-                                <p className="text-sm text-gray-600 mt-1">{selectedIssue.category_name}</p>
-                                <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs ${selectedIssue.status === 'resolved'
-                                        ? 'bg-green-100 text-green-700'
-                                        : 'bg-orange-100 text-orange-700'
-                                    }`}>
-                                    {selectedIssue.status_display}
-                                </span>
+                        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Left Sidebar: Stats & Top Lists */}
+                            <div className="lg:col-span-1">
+                                <NearbyStats />
                             </div>
-                        )}
+
+                            {/* Right: Map Area */}
+                            <div className="lg:col-span-2 relative">
+                                <div className="h-[500px] rounded-xl overflow-hidden shadow-md border border-gray-200 relative bg-gray-100">
+                                    <HeatMap />
+
+                                    {/* Floating Report Button on Map */}
+                                    <button
+                                        onClick={() => setIsReportModalOpen(true)}
+                                        className="absolute bottom-6 right-6 bg-primary-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-primary-700 transition z-[400] flex items-center gap-2 font-semibold"
+                                    >
+                                        📢 Report Issue
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2 text-right">Map shows reported issues in your region.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <ReportIssueModal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} />
 
             {/* Stats Section */}
             <section className="bg-primary-50 py-12 mt-12">

@@ -3,14 +3,17 @@ version: '3.9'
 services:
   # PostgreSQL with PostGIS
   db:
-    image: postgis/postgis:16-3.5
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.postgres
+    image: jan-gan-tantra-db
     container_name: jgt-db
     environment:
       POSTGRES_DB: jan_gan_tantra
       POSTGRES_USER: jgt_user
       POSTGRES_PASSWORD: jgt_dev_password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
@@ -74,24 +77,6 @@ services:
         condition: service_healthy
       search:
         condition: service_healthy
-
-  # Next.js Frontend
-  web:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.web
-    container_name: jgt-web
-    command: npm run dev
-    volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-    depends_on:
-      - api
 
   # Celery Worker (for background tasks)
   worker:

@@ -11,6 +11,7 @@ class Solution(models.Model):
     problem_keywords = models.JSONField(default=list, help_text="Keywords for semantic search")
     steps = models.JSONField(default=list, help_text="Ordered list of action steps")
     success_rate = models.FloatField(default=0.0, help_text="Percentage of users who found this helpful")
+    upvotes = models.IntegerField(default=0)
     language = models.CharField(max_length=10, default='en')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='solutions')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -87,3 +88,26 @@ class SuccessPath(models.Model):
     
     def __str__(self):
         return f"Success: {self.solution.title}"
+
+
+class SolutionSuggestion(models.Model):
+    """
+    User-submitted suggestions/edits for solutions
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    solution = models.ForeignKey(Solution, on_delete=models.CASCADE, related_name='suggestions')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    suggestion_text = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Suggestion for: {self.solution.title}"

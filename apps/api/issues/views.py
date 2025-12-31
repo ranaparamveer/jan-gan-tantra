@@ -75,7 +75,8 @@ class IssueViewSet(viewsets.ModelViewSet):
         return queryset
     
     def perform_create(self, serializer):
-        serializer.save(reported_by=self.request.user)
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(reported_by=user)
     
     def retrieve(self, request, *args, **kwargs):
         """Increment view count on retrieve"""
