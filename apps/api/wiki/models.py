@@ -15,6 +15,7 @@ class Solution(models.Model):
     language = models.CharField(max_length=10, default='en')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='solutions')
     location = models.PointField(null=True, blank=True, help_text="Geolocation of the solution scope")
+    related_issues = models.ManyToManyField('issues.Issue', related_name='solutions', blank=True, help_text="Issues solved by this solution")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

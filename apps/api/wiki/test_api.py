@@ -2,6 +2,7 @@
 API integration tests for Wiki endpoints
 """
 from django.test import TestCase
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -13,6 +14,9 @@ class WikiAPITest(TestCase):
     
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.client.force_authenticate(user=self.user)
+        
         self.category = Category.objects.create(
             name="Sanitation",
             description="Garbage issues"

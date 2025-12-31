@@ -58,11 +58,13 @@ class SolutionDetailSerializer(serializers.ModelSerializer):
     )
     success_paths = SuccessPathSerializer(many=True, read_only=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    related_issues = serializers.StringRelatedField(many=True, read_only=True)
     
     class Meta:
         model = Solution
         fields = ['id', 'title', 'description', 'problem_keywords', 'steps', 
                   'success_rate', 'upvotes', 'language', 'category', 'category_id', 
+                  'related_issues',
                   'created_by_name', 'created_at', 'updated_at', 'is_verified',
                   'success_paths']
         read_only_fields = ['created_at', 'updated_at', 'success_rate', 'upvotes']

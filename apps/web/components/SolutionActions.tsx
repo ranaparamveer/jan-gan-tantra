@@ -21,7 +21,7 @@ export default function SolutionActions({ id, upvotes = 0 }: { id: string, upvot
                     method: 'POST',
                 })
             }
-        } catch (err) {
+        } catch (_err) {
             // Revert if failed
             setVotes(prev => type === 'up' ? prev - 1 : prev + 1)
             setHasVoted(false)
@@ -36,31 +36,16 @@ export default function SolutionActions({ id, upvotes = 0 }: { id: string, upvot
                     title: 'Jan-Gan-Tantra Solution',
                     url: window.location.href
                 })
-            } catch (err) {
+            } catch (_err) {
                 // Share cancelled
             }
         } else {
             try {
                 await navigator.clipboard.writeText(window.location.href)
                 alert('Link copied to clipboard!')
-            } catch (err) {
+            } catch (_err) {
                 alert('Could not copy link')
             }
-        }
-    }
-
-    const handleDownvote = async () => {
-        // Optimistic update
-        setVotes(prev => Math.max(0, prev - 1))
-
-        try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wiki/solutions/${id}/downvote/`, {
-                method: 'POST'
-            })
-        } catch (err) {
-            console.error(err)
-            // Rollback
-            setVotes(prev => prev + 1)
         }
     }
 
@@ -106,8 +91,8 @@ export default function SolutionActions({ id, upvotes = 0 }: { id: string, upvot
 
             {/* Edit Modal */}
             <EditSolutionModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
+                isOpen={isEditOpen}
+                onClose={() => setIsEditOpen(false)}
                 solutionId={Number(id)}
             />
         </>

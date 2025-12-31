@@ -10,7 +10,7 @@ export default function ReportIssueModal({ isOpen, onClose }: { isOpen: boolean,
     const handleLocate = () => {
         navigator.geolocation.getCurrentPosition(
             (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            (err) => alert("Could not access location. Please enable GPS.")
+            (_err) => alert("Could not access location. Please enable GPS.")
         )
     }
 

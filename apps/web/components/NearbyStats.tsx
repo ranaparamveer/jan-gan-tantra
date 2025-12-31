@@ -56,7 +56,16 @@ export default function NearbyStats() {
             ])
 
             // Process Issues
-            const issueFeatures = issuesRes.data.results?.features || (Array.isArray(issuesRes.data.results) ? issuesRes.data.results : []) || []
+            const issueData = issuesRes.data
+            let issueFeatures = []
+            if (issueData.type === 'FeatureCollection') {
+                issueFeatures = issueData.features || []
+            } else if (issueData.results?.type === 'FeatureCollection') {
+                issueFeatures = issueData.results.features || []
+            } else if (Array.isArray(issueData.results)) {
+                issueFeatures = issueData.results
+            }
+
             const topIssues = issueFeatures.map((f: Feature) => ({
                 id: f.id,
                 title: f.properties.title,
@@ -130,7 +139,7 @@ export default function NearbyStats() {
     )
 
     return (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Top 5 Issues */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">

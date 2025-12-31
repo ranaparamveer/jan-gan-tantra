@@ -10,6 +10,16 @@ interface Issue {
     distance?: number
 }
 
+interface Feature {
+    id: number
+    properties?: {
+        title: string
+        status_display: string
+    }
+    title?: string
+    status_display?: string
+}
+
 export default function NearbyIssues() {
     const [issues, setIssues] = useState<Issue[]>([])
     const [loading, setLoading] = useState(true)
@@ -47,7 +57,7 @@ export default function NearbyIssues() {
                     const data = await res.json()
                     // Handle GeoJSON response (results.features or features)
                     const features = data.results?.features || data.features || []
-                    setIssues(features.slice(0, 5).map((f: any) => ({
+                    setIssues(features.slice(0, 5).map((f: Feature) => ({
                         id: f.id,
                         title: f.properties?.title || f.title,
                         status_display: f.properties?.status_display || f.status_display,

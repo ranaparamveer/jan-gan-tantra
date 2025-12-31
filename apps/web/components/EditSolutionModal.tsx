@@ -15,7 +15,8 @@ export default function EditSolutionModal({ isOpen, onClose, solutionId }: { isO
             // Need solution ID - component should accept it as prop.
             // Assuming this component is passed a solutionId prop which we will add now.
 
-            const suggestion = (e.target as any).suggestion.value
+            const formData = new FormData(e.currentTarget as HTMLFormElement)
+            const suggestion = formData.get('suggestion') as string
 
             // NOTE: We need to pass solutionId prop to this modal. For now, failing if not present, but 
             // the parent component needs update. Assuming parent passes `solutionId` prop.

@@ -25,6 +25,17 @@ class IssueViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'upvotes', 'views']
     ordering = ['-created_at']
     
+    @property
+    def paginator(self):
+        """
+        Disable pagination for map views (bbox or radius filtering)
+        to ensure all points are loaded for clustering.
+        """
+        # Note: We don't cache locally to avoid side effects if query params change (unlikely in single request)
+        if self.request.query_params.get('bbox') or (self.request.query_params.get('lat') and self.request.query_params.get('radius')):
+            return None
+        return super().paginator
+
     def get_serializer_class(self):
         if self.action == 'list':
             return IssueListSerializer

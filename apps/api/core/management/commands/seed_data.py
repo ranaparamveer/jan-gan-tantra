@@ -57,11 +57,36 @@ class Command(BaseCommand):
                 'cat': 'Electricity',
                 'steps': ['Find pole number', 'Call electricity helpline 1912', 'Register complaint'],
                 'keywords': ['light', 'dark', 'street', 'unsafe']
+            },
+            {
+                'title': 'Garbage Dump Not Cleared',
+                'cat': 'Sanitation',
+                'steps': ['Call MCD helpline 155304', 'Tweet photo to @MCD_Delhi', 'Use Swachhata App'],
+                'keywords': ['garbage', 'trash', 'clean', 'smell']
+            },
+            {
+                'title': 'Request Fogging for Mosquitoes',
+                'cat': 'Health',
+                'steps': ['Contact local ward councillor', 'Submit written request to DHO', 'Ensure water not stagnant'],
+                'keywords': ['mosquito', 'dengue', 'malaria', 'health']
+            },
+            {
+                'title': 'Police Verification for Tenants',
+                'cat': 'Police',
+                'steps': ['Download form from Delhi Police website', 'Fill tenant details', 'Submit at local PS with documents'],
+                'keywords': ['police', 'tenant', 'verification', 'safety']
             }
         ]
         
+        # Center: 28.627684, 77.215571 (Connaught Place)
+        base_lat, base_lon = 28.627684, 77.215571
+
         for sol in solutions_data:
-            Solution.objects.get_or_create(
+            # Random location near CP for "Local Solutions" demo
+            lat = base_lat + (random.random() - 0.5) * 0.05
+            lon = base_lon + (random.random() - 0.5) * 0.05
+            
+            solution, created = Solution.objects.get_or_create(
                 title=sol['title'],
                 defaults={
                     'category': cat_objs[sol['cat']],
@@ -69,10 +94,18 @@ class Command(BaseCommand):
                     'problem_keywords': sol['keywords'],
                     'language': 'en',
                     'created_by': admin,
-                    'success_rate': 0.85
+                    'success_rate': random.uniform(0.7, 0.95),
+                    'upvotes': random.randint(10, 100),
+                    'location': Point(lon, lat)
                 }
             )
-        self.stdout.write(f'Created {len(solutions_data)} solutions')
+            
+            # Update location if it was already created without one (re-seeding)
+            if not created and not solution.location:
+                solution.location = Point(lon, lat)
+                solution.save()
+
+        self.stdout.write(f'Created {len(solutions_data)} solutions with locations')
 
         # 3. Create Gov Graph
         dept, _ = Department.objects.get_or_create(name='Municipal Corporation', state='Delhi', district='New Delhi', city='New Delhi')
@@ -108,6 +141,17 @@ class Command(BaseCommand):
                 upvotes=random.randint(0, 50)
             )
         self.stdout.write('Created 20 sample issues around Delhi')
+
+        # 4.5 Link Solutions to Issues (Many-to-Many)
+        self.stdout.write('Linking solutions to issues...')
+        all_solutions = Solution.objects.all()
+        for sol in all_solutions:
+            # Find issues in same category
+            relevant_issues = Issue.objects.filter(category=sol.category).order_by('?')[:5]
+            if relevant_issues.exists():
+                sol.related_issues.add(*relevant_issues)
+                sol.save()
+        self.stdout.write('Linked solutions to generated issues')
 
         # 5. Index to MeiliSearch
         try:

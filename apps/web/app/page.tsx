@@ -75,13 +75,13 @@ export default function Home() {
                         </div>
 
                         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Left Sidebar: Stats & Top Lists */}
-                            <div className="lg:col-span-1">
+                            {/* Left Sidebar: Stats & Top Lists (Wider now for side-by-side) */}
+                            <div className="lg:col-span-2">
                                 <NearbyStats />
                             </div>
 
-                            {/* Right: Map Area */}
-                            <div className="lg:col-span-2 relative">
+                            {/* Right: Map Area (Narrower) */}
+                            <div className="lg:col-span-1 relative">
                                 <div className="h-[500px] rounded-xl overflow-hidden shadow-md border border-gray-200 relative bg-gray-100">
                                     <HeatMap />
 

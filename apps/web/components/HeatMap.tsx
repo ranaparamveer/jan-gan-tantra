@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { useLocation } from '@/context/LocationContext'
 import axios from 'axios'
 
@@ -59,9 +61,19 @@ export default function HeatMap({
                 params: { bbox }
             })
 
-            // Backend returns GeoJSON FeatureCollection in results
-            // { count: ..., results: { type: 'FeatureCollection', features: [...] } }
-            const features = data.results?.features || (Array.isArray(data.results) ? data.results : []) || []
+            // Backend returns GeoJSON.
+            // If paginated: { count: ..., results: { type: 'FeatureCollection', features: [...] } }
+            // If not paginated: { type: 'FeatureCollection', features: [...] }
+            let features = []
+            if (data.type === 'FeatureCollection') {
+                features = data.features || []
+            } else if (data.results?.type === 'FeatureCollection') {
+                features = data.results.features || []
+            } else if (Array.isArray(data.results)) {
+                features = data.results
+            } else if (Array.isArray(data)) {
+                features = data
+            }
 
             const mappedIssues = features.map((f: any) => ({
                 id: f.id,

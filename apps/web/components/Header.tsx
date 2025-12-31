@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-
-// import { useLocation } from '@/context/LocationContext'
 import LocationSearch from './LocationSearch'
-
 export default function Header() {
     const [language, setLanguage] = useState('en')
-    const pathname = usePathname()
     // const { location, setLocation, useCurrentLocation } = useLocation()
     // const [locQuery, setLocQuery] = useState('')
 

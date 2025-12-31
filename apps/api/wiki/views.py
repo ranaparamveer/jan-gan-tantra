@@ -35,6 +35,16 @@ class SolutionViewSet(viewsets.ModelViewSet):
     ordering_fields = ['success_rate', 'created_at']
     ordering = ['-success_rate', '-created_at']
     
+    @property
+    def paginator(self):
+        """
+        Disable pagination for map views to allow client-side sorting of all nearby items
+        """
+        # Note: We don't cache locally to avoid side effects if query params change
+        if self.request.query_params.get('lat') and self.request.query_params.get('lng'):
+            return None
+        return super().paginator
+    
     def get_serializer_class(self):
         if self.action == 'list':
             return SolutionListSerializer
