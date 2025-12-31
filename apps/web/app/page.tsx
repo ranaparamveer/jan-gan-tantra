@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import SearchBox from '@/components/SearchBox'
-import SolutionList from '@/components/SolutionList'
 import ReportIssueModal from '@/components/ReportIssueModal'
 import NearbyStats from '@/components/NearbyStats'
 
@@ -11,17 +10,12 @@ import NearbyStats from '@/components/NearbyStats'
 const HeatMap = dynamic(() => import('@/components/HeatMap'), { ssr: false })
 
 export default function Home() {
-    const [searchQuery, setSearchQuery] = useState('')
-    const [selectedIssue, setSelectedIssue] = useState<any>(null)
-    const [language, setLanguage] = useState('en')
+    const [_searchQuery, setSearchQuery] = useState('')
+    const [language] = useState('en')
     const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
     const handleSearch = (query: string) => {
         setSearchQuery(query)
-    }
-
-    const handleIssueClick = (issue: any) => {
-        setSelectedIssue(issue)
     }
 
     return (

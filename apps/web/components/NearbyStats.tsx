@@ -16,6 +16,24 @@ interface Item {
     downvotes: number
 }
 
+interface Feature {
+    id: number
+    properties: {
+        title: string
+        category_name: string
+        status: string
+        upvotes: number
+        downvotes: number
+    }
+}
+
+interface SolutionRes {
+    id: number
+    title: string
+    category_name: string
+    upvotes: number
+}
+
 export default function NearbyStats() {
     const [stats, setStats] = useState<{ issues: Item[], solutions: Item[] }>({ issues: [], solutions: [] })
     const [loading, setLoading] = useState(false)
@@ -39,18 +57,18 @@ export default function NearbyStats() {
 
             // Process Issues
             const issueFeatures = issuesRes.data.results?.features || (Array.isArray(issuesRes.data.results) ? issuesRes.data.results : []) || []
-            const topIssues = issueFeatures.map((f: any) => ({
+            const topIssues = issueFeatures.map((f: Feature) => ({
                 id: f.id,
                 title: f.properties.title,
                 category_name: f.properties.category_name,
                 link: `/issues/${f.id}`,
-                type: 'issue',
+                type: 'issue' as const,
                 status: f.properties.status, // e.g. 'reported', 'in_progress'
                 upvotes: f.properties.upvotes || 0,
                 downvotes: f.properties.downvotes || 0,
             }))
-                .filter((i: any) => i.status !== 'resolved') // Ensure only active issues
-                .sort((a: any, b: any) => b.upvotes - a.upvotes)
+                .filter((i: Item) => i.status !== 'resolved') // Ensure only active issues
+                .sort((a: Item, b: Item) => b.upvotes - a.upvotes)
                 .slice(0, 5)
 
             // Process Solutions
@@ -59,17 +77,17 @@ export default function NearbyStats() {
             // Actually `SolutionListSerializer` is used. It's a ModelSerializer.
             // So response is `results: [...]` or just `[...]` depending on pagination.
             const solutionData = solutionsRes.data.results || (Array.isArray(solutionsRes.data) ? solutionsRes.data : []) || []
-            const topSolutions = solutionData.map((s: any) => ({
+            const topSolutions = solutionData.map((s: SolutionRes) => ({
                 id: s.id,
                 title: s.title,
                 category_name: s.category_name,
                 link: `/solution/${s.id}`, // Corrected URL
-                type: 'solution',
+                type: 'solution' as const,
                 status: 'published',
                 upvotes: s.upvotes || 0,
                 downvotes: 0, // Backend downvote just decrements upvotes currently
             }))
-                .sort((a: any, b: any) => b.upvotes - a.upvotes)
+                .sort((a: Item, b: Item) => b.upvotes - a.upvotes)
                 .slice(0, 5)
 
             setStats({

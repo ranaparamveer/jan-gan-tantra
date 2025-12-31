@@ -12,13 +12,15 @@ class CategoryModelTest(TestCase):
     def setUp(self):
         self.category = Category.objects.create(
             name="Sanitation",
+            slug="sanitation",
             description="Garbage and sewage issues"
         )
     
     def test_category_creation(self):
         """Test category is created correctly"""
         self.assertEqual(self.category.name, "Sanitation")
-        self.assertIsNotNone(self.category.created_at)
+        # Category does not have created_at field
+        # self.assertIsNotNone(self.category.created_at)
     
     def test_category_str(self):
         """Test string representation"""
@@ -29,13 +31,13 @@ class SolutionModelTest(TestCase):
     """Test Solution model"""
     
     def setUp(self):
-        self.category = Category.objects.create(name="Sanitation")
+        self.category = Category.objects.create(name="Sanitation", slug="sanitation")
         self.solution = Solution.objects.create(
             title="How to report garbage collection issues",
             description="Step-by-step guide",
             category=self.category,
             language="en",
-            steps="1. Find officer\n2. File complaint\n3. Follow up"
+            steps=["1. Find officer", "2. File complaint", "3. Follow up"]
         )
     
     def test_solution_creation(self):
@@ -60,44 +62,49 @@ class TemplateModelTest(TestCase):
     """Test Template model"""
     
     def setUp(self):
+        self.category = Category.objects.create(name="Legal", slug="legal")
         self.template = Template.objects.create(
-            name="RTI Application",
+            title="RTI Application",
             template_type="rti",
             language="en",
-            content="To,\nPublic Information Officer\n..."
+            content="To,\nPublic Information Officer\n...",
+            category=self.category
         )
     
     def test_template_creation(self):
         """Test template is created correctly"""
-        self.assertEqual(self.template.name, "RTI Application")
+        self.assertEqual(self.template.title, "RTI Application")
         self.assertEqual(self.template.template_type, "rti")
     
     def test_template_str(self):
         """Test string representation"""
-        self.assertEqual(str(self.template), "RTI Application (rti)")
+        self.assertEqual(str(self.template), "RTI Application - RTI Application")
 
 
 class SuccessPathModelTest(TestCase):
     """Test SuccessPath model"""
     
     def setUp(self):
-        category = Category.objects.create(name="Sanitation")
+        category = Category.objects.create(name="Sanitation", slug="sanitation")
         self.solution = Solution.objects.create(
             title="Test Solution",
+            description="Description",
             category=category,
             language="en"
         )
+        self.user = User.objects.create_user(username="johndoe")
         self.success_path = SuccessPath.objects.create(
             solution=self.solution,
-            user_name="John Doe",
-            story="I followed the steps and it worked!",
-            resolution_time_days=7
+            user=self.user,
+            steps_taken=["Step 1", "Step 2"],
+            outcome="I followed the steps and it worked!",
+            time_to_resolve=7
         )
     
     def test_success_path_creation(self):
         """Test success path is created correctly"""
-        self.assertEqual(self.success_path.user_name, "John Doe")
-        self.assertEqual(self.success_path.resolution_time_days, 7)
+        self.assertEqual(self.success_path.user.username, "johndoe")
+        self.assertEqual(self.success_path.time_to_resolve, 7)
     
     def test_success_path_relationship(self):
         """Test relationship with solution"""

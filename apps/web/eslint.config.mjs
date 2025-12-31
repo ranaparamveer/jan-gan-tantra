@@ -11,7 +11,8 @@ export default tseslint.config(
             'out/**',
             'build/**',
             '*.config.js',
-            '*.config.ts'
+            '*.config.ts',
+            'next-env.d.ts'
         ]
     },
     {

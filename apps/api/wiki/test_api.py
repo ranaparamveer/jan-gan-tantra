@@ -76,9 +76,9 @@ class WikiAPITest(TestCase):
         data = {
             'title': 'New Solution',
             'description': 'Test description',
-            'category': self.category.id,
+            'category_id': self.category.id,
             'language': 'en',
-            'steps': '1. Step one\n2. Step two'
+            'steps': ['1. Step one', '2. Step two']
         }
         
         response = self.client.post(url, data, format='json')

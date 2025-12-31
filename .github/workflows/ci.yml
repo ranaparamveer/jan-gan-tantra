@@ -59,15 +59,6 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Run migrations
-      env:
-        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-        DJANGO_SECRET_KEY: test-secret-key-for-ci
-        DEBUG: True
-      run: |
-        cd apps/api
-        python manage.py migrate
-    
     - name: Run tests
       env:
         DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
@@ -75,6 +66,7 @@ jobs:
         DEBUG: True
       run: |
         cd apps/api
+        # Django test runner handles test DB creation and migration automatically
         python manage.py test
     
     - name: Run linting
