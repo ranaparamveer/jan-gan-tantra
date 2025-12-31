@@ -61,17 +61,23 @@ Jan-Gan-Tantra transforms the citizen-government relationship by providing:
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/jan-gan-tantra.git
+git clone https://github.com/ranaparamveer/jan-gan-tantra.git
 cd jan-gan-tantra
 
+# Setup environment
+cp .env.example .env
+# Edit .env and add your API keys (Bhashini, OpenAI)
+
 # Start all services
-docker-compose up -d
+./start.sh
 
 # Access the platform
 # Frontend: http://localhost:3000
 # API: http://localhost:8000
-# MeiliSearch: http://localhost:7700
+# Swagger: http://localhost:8000/swagger/
 ```
+
+For detailed setup instructions, see [SETUP.md](SETUP.md).
 
 ### Development Setup
 
